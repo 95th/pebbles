@@ -7,7 +7,8 @@ use crate::{
     assets::SceneAssets,
     bullets::Bullet,
     collision::Collider,
-    movement::{Acceleration, MovingObject, MovingObjectBundle, Velocity},
+    despawn::DespawnWhenFar,
+    movement::{Acceleration, MovingObjectBundle, Velocity},
 };
 
 const SPAWN_RANGE_X: Range<f32> = -25.0..25.0;
@@ -71,8 +72,8 @@ fn spawn_enemy(
                 ..default()
             },
             collider: Collider::new(2.0),
-            moving_object: MovingObject,
         },
+        DespawnWhenFar,
         Enemy,
     ));
 }

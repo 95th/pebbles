@@ -1,7 +1,5 @@
 use bevy::prelude::*;
 
-use crate::movement::MovingObject;
-
 pub struct DespawnPlugin;
 
 impl Plugin for DespawnPlugin {
@@ -10,11 +8,14 @@ impl Plugin for DespawnPlugin {
     }
 }
 
+#[derive(Component)]
+pub struct DespawnWhenFar;
+
 const DESPAWN_DISTANCE: f32 = 100.0;
 
 fn despawn_far_objects(
     mut commands: Commands,
-    query: Query<(Entity, &GlobalTransform), With<MovingObject>>,
+    query: Query<(Entity, &GlobalTransform), With<DespawnWhenFar>>,
 ) {
     for (entity, transform) in query.iter() {
         let distance = transform.translation().distance(Vec3::ZERO);
