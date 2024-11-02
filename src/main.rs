@@ -4,6 +4,7 @@ mod assets;
 mod bullets;
 mod camera;
 mod collision;
+mod despawn;
 mod enemy;
 mod game;
 mod movement;

@@ -27,7 +27,6 @@ impl Plugin for EnemyPlugin {
         )));
 
         app.add_systems(Update, (spawn_enemy, check_bullet_collision));
-        app.add_systems(FixedUpdate, check_enemy_out_of_reach);
     }
 }
 
@@ -75,21 +74,6 @@ fn spawn_enemy(
         },
         Enemy,
     ));
-}
-
-fn check_enemy_out_of_reach(
-    mut commands: Commands,
-    mut query: Query<(Entity, &Transform), With<Enemy>>,
-) {
-    for (entity, transform) in query.iter_mut() {
-        if transform.translation.z < -100.0
-            || transform.translation.z > 100.0
-            || transform.translation.x < -100.0
-            || transform.translation.x > 100.0
-        {
-            commands.entity(entity).despawn_recursive();
-        }
-    }
 }
 
 fn check_bullet_collision(

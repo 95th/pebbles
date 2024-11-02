@@ -16,7 +16,6 @@ impl Plugin for BulletsPlugin {
     fn build(&self, app: &mut App) {
         app.insert_resource(BulletTimer(Timer::from_seconds(0.2, TimerMode::Repeating)));
         app.add_systems(Update, spawn_bullets);
-        app.add_systems(FixedUpdate, check_bullets_out_of_reach);
     }
 }
 
@@ -53,15 +52,4 @@ fn spawn_bullets(
         },
         Bullet,
     ));
-}
-
-fn check_bullets_out_of_reach(
-    mut commands: Commands,
-    mut query: Query<(Entity, &Transform), With<Bullet>>,
-) {
-    for (entity, transform) in query.iter_mut() {
-        if transform.translation.z > 100.0 {
-            commands.entity(entity).despawn_recursive();
-        }
-    }
 }
