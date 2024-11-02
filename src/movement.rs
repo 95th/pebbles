@@ -10,8 +10,12 @@ impl Plugin for MovementPlugin {
     }
 }
 
+#[derive(Component)]
+pub struct MovingObject;
+
 #[derive(Bundle)]
 pub struct MovingObjectBundle {
+    pub moving_object: MovingObject,
     pub velocity: Velocity,
     pub acceleration: Acceleration,
     pub scene: SceneBundle,

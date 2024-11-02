@@ -3,7 +3,7 @@ use bevy::prelude::*;
 use crate::{
     assets::SceneAssets,
     collision::Collider,
-    movement::{Acceleration, MovingObjectBundle, Velocity},
+    movement::{Acceleration, MovingObject, MovingObjectBundle, Velocity},
     ship::Ship,
 };
 
@@ -49,6 +49,7 @@ fn spawn_bullets(
             velocity: Velocity(Vec3::Z * BULLET_SPEED),
             acceleration: Acceleration(Vec3::Z * BULLET_ACCELERATION),
             collider: Collider::new(1.0),
+            moving_object: MovingObject,
         },
         Bullet,
     ));
