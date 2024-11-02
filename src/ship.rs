@@ -12,7 +12,7 @@ pub struct ShipPlugin;
 impl Plugin for ShipPlugin {
     fn build(&self, app: &mut App) {
         app.add_systems(PostStartup, spawn_ship);
-        app.add_systems(Update, (ship_movement, check_bounds));
+        app.add_systems(Update, ship_movement);
     }
 }
 
@@ -41,19 +41,7 @@ fn ship_movement(
         transform.translation.x -= motion.delta.x * 0.1;
         transform.translation.z -= motion.delta.y * 0.1;
     }
-}
 
-fn check_bounds(mut transform: Query<&mut Transform, With<Ship>>) {
-    let mut transform = transform.single_mut();
-    if transform.translation.x < BOUNDS_LEFT {
-        transform.translation.x = BOUNDS_LEFT;
-    } else if transform.translation.x > BOUNDS_RIGHT {
-        transform.translation.x = BOUNDS_RIGHT;
-    }
-
-    if transform.translation.z < BOUNDS_BOTTOM {
-        transform.translation.z = BOUNDS_BOTTOM;
-    } else if transform.translation.z > BOUNDS_TOP {
-        transform.translation.z = BOUNDS_TOP;
-    }
+    transform.translation.x = transform.translation.x.clamp(BOUNDS_LEFT, BOUNDS_RIGHT);
+    transform.translation.z = transform.translation.z.clamp(BOUNDS_BOTTOM, BOUNDS_TOP);
 }
