@@ -8,6 +8,7 @@ use crate::despawn::DespawnPlugin;
 use crate::enemy::EnemyPlugin;
 use crate::movement::MovementPlugin;
 use crate::ship::ShipPlugin;
+use crate::window::WindowPlugin;
 
 pub struct GamePlugin;
 
@@ -15,6 +16,7 @@ impl Plugin for GamePlugin {
     fn build(&self, app: &mut App) {
         app.insert_resource(ClearColor(Color::srgb(0.1, 0.0, 0.15)));
 
+        app.add_plugins(WindowPlugin);
         app.add_plugins(SceneAssetLoaderPlugin);
         app.add_plugins(CameraPlugin);
         app.add_plugins(ShipPlugin);

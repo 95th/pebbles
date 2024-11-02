@@ -1,4 +1,4 @@
-use bevy::{input::mouse::MouseMotion, prelude::*, window::CursorGrabMode};
+use bevy::{input::mouse::MouseMotion, prelude::*};
 
 use crate::assets::SceneAssets;
 
@@ -19,7 +19,7 @@ impl Plugin for ShipPlugin {
 #[derive(Component)]
 pub struct Ship;
 
-fn spawn_ship(mut commands: Commands, assets: Res<SceneAssets>, mut window: Query<&mut Window>) {
+fn spawn_ship(mut commands: Commands, assets: Res<SceneAssets>) {
     commands.spawn((
         SceneBundle {
             scene: assets.ship.clone(),
@@ -27,9 +27,6 @@ fn spawn_ship(mut commands: Commands, assets: Res<SceneAssets>, mut window: Quer
         },
         Ship,
     ));
-    let mut window = window.single_mut();
-    window.cursor.visible = false;
-    window.cursor.grab_mode = CursorGrabMode::Confined;
 }
 
 fn ship_movement(

@@ -9,6 +9,7 @@ mod enemy;
 mod game;
 mod movement;
 mod ship;
+mod window;
 
 fn main() {
     App::new()
