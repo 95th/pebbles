@@ -1,4 +1,4 @@
-use bevy::prelude::*;
+use bevy::{core_pipeline::bloom::BloomSettings, prelude::*};
 
 const CAMERA_DISTANCE: f32 = 80.0;
 
@@ -15,11 +15,18 @@ fn spawn_camera(
     mut meshes: ResMut<Assets<Mesh>>,
     mut materials: ResMut<Assets<StandardMaterial>>,
 ) {
-    commands.spawn(Camera3dBundle {
-        transform: Transform::from_translation(Vec3::Y * CAMERA_DISTANCE)
-            .looking_at(Vec3::ZERO, Vec3::Z),
-        ..default()
-    });
+    commands.spawn((
+        Camera3dBundle {
+            camera: Camera {
+                hdr: true,
+                ..default()
+            },
+            transform: Transform::from_translation(Vec3::Y * CAMERA_DISTANCE)
+                .looking_at(Vec3::ZERO, Vec3::Z),
+            ..default()
+        },
+        BloomSettings::NATURAL,
+    ));
 
     commands.insert_resource(AmbientLight {
         color: Color::WHITE,
