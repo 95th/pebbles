@@ -71,9 +71,9 @@ fn spawn_enemy(
                     .with_rotation(Quat::from_rotation_y(PI)),
                 ..default()
             },
+            collider: Collider::new(2.0),
         },
         Enemy,
-        Collider::new(2.0),
     ));
 }
 
@@ -87,7 +87,7 @@ fn check_enemy_out_of_reach(
             || transform.translation.x < -100.0
             || transform.translation.x > 100.0
         {
-            commands.entity(entity).despawn();
+            commands.entity(entity).despawn_recursive();
         }
     }
 }
@@ -100,8 +100,8 @@ fn check_bullet_collision(
     for (enemy_entity, enemy_collider) in enemies.iter() {
         for &colliding_entity in enemy_collider.colliding_entities.iter() {
             if bullets.get(colliding_entity).is_ok() {
-                commands.entity(colliding_entity).despawn();
-                commands.entity(enemy_entity).despawn();
+                commands.entity(colliding_entity).despawn_recursive();
+                commands.entity(enemy_entity).despawn_recursive();
             }
         }
     }

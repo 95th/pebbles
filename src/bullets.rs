@@ -49,9 +49,9 @@ fn spawn_bullets(
             },
             velocity: Velocity(Vec3::Z * BULLET_SPEED),
             acceleration: Acceleration(Vec3::Z * BULLET_ACCELERATION),
+            collider: Collider::new(1.0),
         },
         Bullet,
-        Collider::new(1.0),
     ));
 }
 
@@ -61,7 +61,7 @@ fn check_bullets_out_of_reach(
 ) {
     for (entity, transform) in query.iter_mut() {
         if transform.translation.z > 100.0 {
-            commands.entity(entity).despawn();
+            commands.entity(entity).despawn_recursive();
         }
     }
 }
