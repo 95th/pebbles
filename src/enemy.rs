@@ -5,6 +5,8 @@ use rand::Rng;
 
 use crate::{
     assets::SceneAssets,
+    bullets::Bullet,
+    collision::Collider,
     movement::{Acceleration, MovingObjectBundle, Velocity},
 };
 
@@ -24,7 +26,7 @@ impl Plugin for EnemyPlugin {
             TimerMode::Repeating,
         )));
 
-        app.add_systems(Update, spawn_enemy);
+        app.add_systems(Update, (spawn_enemy, check_bullet_collision));
         app.add_systems(FixedUpdate, check_enemy_out_of_reach);
     }
 }
@@ -71,6 +73,7 @@ fn spawn_enemy(
             },
         },
         Enemy,
+        Collider::new(2.0),
     ));
 }
 
@@ -85,6 +88,21 @@ fn check_enemy_out_of_reach(
             || transform.translation.x > 100.0
         {
             commands.entity(entity).despawn();
+        }
+    }
+}
+
+fn check_bullet_collision(
+    mut commands: Commands,
+    enemies: Query<(Entity, &Collider), With<Enemy>>,
+    bullets: Query<(), With<Bullet>>,
+) {
+    for (enemy_entity, enemy_collider) in enemies.iter() {
+        for &colliding_entity in enemy_collider.colliding_entities.iter() {
+            if bullets.get(colliding_entity).is_ok() {
+                commands.entity(colliding_entity).despawn();
+                commands.entity(enemy_entity).despawn();
+            }
         }
     }
 }

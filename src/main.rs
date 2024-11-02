@@ -3,6 +3,7 @@ use bevy::prelude::*;
 mod assets;
 mod bullets;
 mod camera;
+mod collision;
 mod enemy;
 mod game;
 mod movement;

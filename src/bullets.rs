@@ -2,6 +2,7 @@ use bevy::prelude::*;
 
 use crate::{
     assets::SceneAssets,
+    collision::Collider,
     movement::{Acceleration, MovingObjectBundle, Velocity},
     ship::Ship,
 };
@@ -20,7 +21,7 @@ impl Plugin for BulletsPlugin {
 }
 
 #[derive(Component)]
-struct Bullet;
+pub struct Bullet;
 
 #[derive(Resource, Deref, DerefMut)]
 struct BulletTimer(Timer);
@@ -50,6 +51,7 @@ fn spawn_bullets(
             acceleration: Acceleration(Vec3::Z * BULLET_ACCELERATION),
         },
         Bullet,
+        Collider::new(1.0),
     ));
 }
 
