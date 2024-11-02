@@ -15,25 +15,27 @@ fn spawn_camera(
     mut meshes: ResMut<Assets<Mesh>>,
     mut materials: ResMut<Assets<StandardMaterial>>,
 ) {
-    commands.spawn((
-        Camera3d::default(),
-        Transform::from_translation(Vec3::Y * CAMERA_DISTANCE).looking_at(Vec3::ZERO, Vec3::Z),
-    ));
+    commands.spawn(Camera3dBundle {
+        transform: Transform::from_translation(Vec3::Y * CAMERA_DISTANCE)
+            .looking_at(Vec3::ZERO, Vec3::Z),
+        ..default()
+    });
 
     commands.insert_resource(AmbientLight {
         color: Color::WHITE,
         brightness: 800.0,
     });
 
-    commands.spawn((
-        DirectionalLight {
+    commands.spawn(DirectionalLightBundle {
+        directional_light: DirectionalLight {
             illuminance: light_consts::lux::FULL_DAYLIGHT,
             shadows_enabled: true,
             ..default()
         },
-        Transform::from_translation(Vec3::new(-1000.0, 50.0, 1000.0))
+        transform: Transform::from_translation(Vec3::new(-1000.0, 50.0, 1000.0))
             .looking_at(Vec3::ZERO, Vec3::Z),
-    ));
+        ..default()
+    });
 
     commands.spawn(MaterialMeshBundle {
         mesh: meshes.add(Cuboid::new(500.0, 2.0, 500.0)),
