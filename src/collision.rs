@@ -1,6 +1,6 @@
 use bevy::prelude::*;
 
-use crate::{health::Health, schedule::GameSchedule};
+use crate::{bullets::Bullet, enemy::Enemy, health::Health, schedule::GameSchedule};
 
 pub struct CollisionDetectionPlugin;
 
@@ -30,10 +30,7 @@ impl Damage {
 }
 
 #[derive(Event)]
-pub struct CollisionEvent {
-    pub source: Entity,
-    pub target: Entity,
-}
+struct CollisionEvent(Entity, Entity);
 
 #[derive(Component)]
 pub struct Collider {
@@ -47,25 +44,21 @@ impl Collider {
 }
 
 fn check_collision(
-    sources: Query<(Entity, &Transform, &Collider), With<Damage>>,
-    targets: Query<(Entity, &Transform, &Collider), With<Health>>,
+    bullets: Query<(Entity, &Transform, &Collider), With<Bullet>>,
+    enemies: Query<(Entity, &Transform, &Collider), With<Enemy>>,
     mut collision_event_writer: EventWriter<CollisionEvent>,
 ) {
-    for (src_entity, src_transform, src_collider) in sources.iter() {
-        for (target_entity, target_transform, target_collider) in targets.iter() {
-            if src_entity == target_entity {
-                continue;
-            }
-
-            let distance = src_transform
+    for (bullet_entity, bullet_transform, bullet_collider) in bullets.iter() {
+        for (enemy_entity, enemy_transform, enemy_collider) in enemies.iter() {
+            let distance = bullet_transform
                 .translation
-                .distance(target_transform.translation);
+                .distance(enemy_transform.translation);
 
-            if distance < src_collider.radius + target_collider.radius {
-                collision_event_writer.send(CollisionEvent {
-                    source: src_entity,
-                    target: target_entity,
-                });
+            if distance < bullet_collider.radius + enemy_collider.radius {
+                collision_event_writer.send_batch([
+                    CollisionEvent(bullet_entity, enemy_entity),
+                    CollisionEvent(enemy_entity, bullet_entity),
+                ]);
             }
         }
     }
@@ -73,16 +66,16 @@ fn check_collision(
 
 fn apply_collision_damage(
     mut collision_event_reader: EventReader<CollisionEvent>,
-    mut health_query: Query<&mut Health>,
-    collision_damage_query: Query<&Damage>,
+    mut healths: Query<&mut Health>,
+    damages: Query<&Damage>,
 ) {
-    for event in collision_event_reader.read() {
-        let Ok(mut health) = health_query.get_mut(event.target) else {
+    for &CollisionEvent(a, b) in collision_event_reader.read() {
+        let Ok(mut health) = healths.get_mut(a) else {
             continue;
         };
-        let Ok(collision_damage) = collision_damage_query.get(event.source) else {
+        let Ok(damage) = damages.get(b) else {
             continue;
         };
-        health.value -= collision_damage.amount;
+        health.value -= damage.amount;
     }
 }

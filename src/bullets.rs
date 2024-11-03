@@ -24,6 +24,9 @@ impl Plugin for BulletsPlugin {
     }
 }
 
+#[derive(Component)]
+pub struct Bullet;
+
 #[derive(Resource, Deref, DerefMut)]
 struct BulletTimer(Timer);
 
@@ -53,6 +56,7 @@ fn spawn_bullets(
             collider: Collider::new(1.0),
         },
         DespawnWhenFar,
+        Bullet,
         Health::new(BULLET_HEALTH),
         Damage::new(BULLET_DAMAGE),
     ));
