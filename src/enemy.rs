@@ -20,7 +20,7 @@ const ACCELERATION_SCALE: f32 = 1.0;
 const SPAWN_TIME_SECONDS: f32 = 1.0;
 
 const ENEMY_HEALTH: f32 = 100.0;
-const ENEMY_DAMAGE: f32 = 10.0; // Exactly the same as the bullet damage
+const ENEMY_DAMAGE: f32 = 10.0; // Exactly the same as the bullet health
 
 pub struct EnemyPlugin;
 
