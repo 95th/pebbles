@@ -1,4 +1,9 @@
-use bevy::{core_pipeline::bloom::BloomSettings, prelude::*};
+use bevy::{
+    core_pipeline::{bloom::BloomSettings, motion_blur::MotionBlurBundle},
+    prelude::*,
+};
+
+use crate::{schedule::GameSchedule, ship::Ship};
 
 const CAMERA_DISTANCE: f32 = 80.0;
 
@@ -7,6 +12,7 @@ pub struct CameraPlugin;
 impl Plugin for CameraPlugin {
     fn build(&self, app: &mut App) {
         app.add_systems(Startup, spawn_camera);
+        app.add_systems(Update, follow_ship.in_set(GameSchedule::UserInput));
     }
 }
 
@@ -26,6 +32,7 @@ fn spawn_camera(
             ..default()
         },
         BloomSettings::NATURAL,
+        MotionBlurBundle::default(),
     ));
 
     commands.insert_resource(AmbientLight {
@@ -50,4 +57,14 @@ fn spawn_camera(
         transform: Transform::from_translation(Vec3::new(0.0, -4.0, 0.0)),
         ..default()
     });
+}
+
+fn follow_ship(
+    mut query: Query<&mut Transform, With<Camera>>,
+    ship_query: Query<&Transform, (With<Ship>, Without<Camera>)>,
+) {
+    let ship_transform = ship_query.single();
+    let mut camera_transform = query.single_mut();
+    camera_transform.translation.x = ship_transform.translation.x / 3.0;
+    camera_transform.translation.z = ship_transform.translation.z / 3.0;
 }
