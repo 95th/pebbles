@@ -1,6 +1,6 @@
-use bevy::prelude::*;
+use bevy::{core_pipeline::bloom::BloomSettings, prelude::*};
 
-use crate::{schedule::GameSchedule, ship::Ship};
+use crate::{schedule::GameSchedule, ship::Ship, state::GameState};
 
 const CAMERA_DISTANCE: f32 = 80.0;
 
@@ -10,6 +10,8 @@ impl Plugin for CameraPlugin {
     fn build(&self, app: &mut App) {
         app.add_systems(Startup, spawn_camera);
         app.add_systems(Update, follow_ship.in_set(GameSchedule::UserInput));
+        app.add_systems(OnEnter(GameState::Paused), blur_camera);
+        app.add_systems(OnExit(GameState::Paused), unblur_camera);
     }
 }
 
@@ -18,11 +20,18 @@ fn spawn_camera(
     mut meshes: ResMut<Assets<Mesh>>,
     mut materials: ResMut<Assets<StandardMaterial>>,
 ) {
-    commands.spawn((Camera3dBundle {
-        transform: Transform::from_translation(Vec3::Y * CAMERA_DISTANCE)
-            .looking_at(Vec3::ZERO, Vec3::Z),
-        ..default()
-    },));
+    commands.spawn((
+        Camera3dBundle {
+            camera: Camera {
+                hdr: true,
+                ..default()
+            },
+            transform: Transform::from_translation(Vec3::Y * CAMERA_DISTANCE)
+                .looking_at(Vec3::ZERO, Vec3::Z),
+            ..default()
+        },
+        BloomSettings::NATURAL,
+    ));
 
     commands.insert_resource(AmbientLight {
         color: Color::WHITE,
@@ -56,4 +65,14 @@ fn follow_ship(
     let mut camera_transform = query.single_mut();
     camera_transform.translation.x = ship_transform.translation.x / 3.0;
     camera_transform.translation.z = ship_transform.translation.z / 3.0;
+}
+
+fn blur_camera(mut bloom_settings: Query<&mut BloomSettings, With<Camera>>) {
+    let mut bloom_settings = bloom_settings.single_mut();
+    *bloom_settings = BloomSettings::SCREEN_BLUR;
+}
+
+fn unblur_camera(mut bloom_settings: Query<&mut BloomSettings, With<Camera>>) {
+    let mut bloom_settings = bloom_settings.single_mut();
+    *bloom_settings = BloomSettings::NATURAL;
 }
