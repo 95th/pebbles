@@ -2,11 +2,16 @@ use std::collections::HashMap;
 
 use bevy::prelude::*;
 
+use crate::schedule::GameSchedule;
+
 pub struct CollisionDetectionPlugin;
 
 impl Plugin for CollisionDetectionPlugin {
     fn build(&self, app: &mut App) {
-        app.add_systems(Update, check_collision);
+        app.add_systems(
+            Update,
+            check_collision.in_set(GameSchedule::CollisionDetection),
+        );
     }
 }
 
@@ -25,7 +30,7 @@ impl Collider {
     }
 }
 
-fn check_collision(mut query: Query<(Entity, &GlobalTransform, &mut Collider)>) {
+fn check_collision(mut query: Query<(Entity, &Transform, &mut Collider)>) {
     let mut colliding_entity_map = HashMap::<Entity, Vec<Entity>>::new();
 
     for (entity_a, transform_a, collider_a) in query.iter() {
@@ -34,14 +39,12 @@ fn check_collision(mut query: Query<(Entity, &GlobalTransform, &mut Collider)>) 
                 continue;
             }
 
-            let distance = transform_a
-                .translation()
-                .distance(transform_b.translation());
+            let distance = transform_a.translation.distance(transform_b.translation);
 
             if distance < collider_a.radius + collider_b.radius {
                 colliding_entity_map
                     .entry(entity_a)
-                    .or_insert(Vec::new())
+                    .or_insert_with(Vec::new)
                     .push(entity_b);
             }
         }

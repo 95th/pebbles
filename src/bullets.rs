@@ -5,8 +5,8 @@ use crate::{
     collision::Collider,
     despawn::DespawnWhenFar,
     movement::{Acceleration, MovingObjectBundle, Velocity},
+    schedule::GameSchedule,
     ship::Ship,
-    state::GameState,
 };
 
 const BULLET_SPEED: f32 = 30.0;
@@ -17,7 +17,7 @@ pub struct BulletsPlugin;
 impl Plugin for BulletsPlugin {
     fn build(&self, app: &mut App) {
         app.insert_resource(BulletTimer(Timer::from_seconds(0.2, TimerMode::Repeating)));
-        app.add_systems(Update, spawn_bullets.run_if(in_state(GameState::Playing)));
+        app.add_systems(Update, spawn_bullets.in_set(GameSchedule::UserInput));
     }
 }
 

@@ -1,10 +1,15 @@
 use bevy::prelude::*;
 
+use crate::schedule::GameSchedule;
+
 pub struct DespawnPlugin;
 
 impl Plugin for DespawnPlugin {
     fn build(&self, app: &mut App) {
-        app.add_systems(Update, despawn_far_objects);
+        app.add_systems(
+            Update,
+            despawn_far_objects.in_set(GameSchedule::DespawnEntities),
+        );
     }
 }
 

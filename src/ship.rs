@@ -1,6 +1,6 @@
 use bevy::{input::mouse::MouseMotion, prelude::*};
 
-use crate::{assets::SceneAssets, state::GameState};
+use crate::{assets::SceneAssets, schedule::GameSchedule};
 
 const BOUNDS_LEFT: f32 = -40.0;
 const BOUNDS_RIGHT: f32 = 40.0;
@@ -12,7 +12,7 @@ pub struct ShipPlugin;
 impl Plugin for ShipPlugin {
     fn build(&self, app: &mut App) {
         app.add_systems(PostStartup, spawn_ship);
-        app.add_systems(Update, ship_movement.run_if(in_state(GameState::Playing)));
+        app.add_systems(Update, ship_movement.in_set(GameSchedule::UserInput));
     }
 }
 

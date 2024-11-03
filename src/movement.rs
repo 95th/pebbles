@@ -1,6 +1,6 @@
 use bevy::prelude::*;
 
-use crate::{collision::Collider, state::GameState};
+use crate::{collision::Collider, schedule::GameSchedule};
 
 pub struct MovementPlugin;
 
@@ -8,7 +8,7 @@ impl Plugin for MovementPlugin {
     fn build(&self, app: &mut App) {
         app.add_systems(
             Update,
-            (update_velocity, update_position).run_if(in_state(GameState::Playing)),
+            (update_velocity, update_position).in_set(GameSchedule::EntityUpdates),
         );
     }
 }

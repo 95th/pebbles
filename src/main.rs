@@ -8,6 +8,7 @@ mod despawn;
 mod enemy;
 mod game;
 mod movement;
+mod schedule;
 mod ship;
 mod state;
 mod window;

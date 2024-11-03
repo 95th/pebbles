@@ -7,6 +7,7 @@ use crate::collision::CollisionDetectionPlugin;
 use crate::despawn::DespawnPlugin;
 use crate::enemy::EnemyPlugin;
 use crate::movement::MovementPlugin;
+use crate::schedule::GameSchedulePlugin;
 use crate::ship::ShipPlugin;
 use crate::state::GameStatePlugin;
 use crate::window::WindowPlugin;
@@ -19,6 +20,7 @@ impl Plugin for GamePlugin {
 
         app.add_plugins(WindowPlugin);
         app.add_plugins(GameStatePlugin);
+        app.add_plugins(GameSchedulePlugin);
         app.add_plugins(SceneAssetLoaderPlugin);
         app.add_plugins(CameraPlugin);
         app.add_plugins(ShipPlugin);
