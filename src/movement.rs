@@ -1,12 +1,15 @@
 use bevy::prelude::*;
 
-use crate::collision::Collider;
+use crate::{collision::Collider, state::not_paused};
 
 pub struct MovementPlugin;
 
 impl Plugin for MovementPlugin {
     fn build(&self, app: &mut App) {
-        app.add_systems(Update, (update_velocity, update_position));
+        app.add_systems(
+            Update,
+            (update_velocity, update_position).run_if(not_paused),
+        );
     }
 }
 

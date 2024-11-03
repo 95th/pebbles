@@ -6,6 +6,7 @@ use crate::{
     despawn::DespawnWhenFar,
     movement::{Acceleration, MovingObjectBundle, Velocity},
     ship::Ship,
+    state::not_paused,
 };
 
 const BULLET_SPEED: f32 = 30.0;
@@ -16,7 +17,7 @@ pub struct BulletsPlugin;
 impl Plugin for BulletsPlugin {
     fn build(&self, app: &mut App) {
         app.insert_resource(BulletTimer(Timer::from_seconds(0.2, TimerMode::Repeating)));
-        app.add_systems(Update, spawn_bullets);
+        app.add_systems(Update, spawn_bullets.run_if(not_paused));
     }
 }
 

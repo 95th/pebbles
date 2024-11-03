@@ -9,6 +9,7 @@ mod enemy;
 mod game;
 mod movement;
 mod ship;
+mod state;
 mod window;
 
 fn main() {
