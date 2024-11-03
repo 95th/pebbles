@@ -9,7 +9,7 @@ use crate::{
     collision::Collider,
     despawn::DespawnWhenFar,
     movement::{Acceleration, MovingObjectBundle, Velocity},
-    state::not_paused,
+    state::GameState,
 };
 
 const SPAWN_RANGE_X: Range<f32> = -25.0..25.0;
@@ -30,7 +30,7 @@ impl Plugin for EnemyPlugin {
 
         app.add_systems(
             Update,
-            (spawn_enemy, check_bullet_collision).run_if(not_paused),
+            (spawn_enemy, check_bullet_collision).run_if(in_state(GameState::Playing)),
         );
     }
 }

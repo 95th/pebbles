@@ -3,7 +3,7 @@ use bevy::prelude::*;
 #[derive(Default, Debug, Hash, PartialEq, Eq, Clone, Copy, States)]
 pub enum GameState {
     #[default]
-    InGame,
+    Playing,
     Paused,
 }
 
@@ -26,15 +26,11 @@ fn pause_toggle_system(
     }
 
     match state.get() {
-        GameState::InGame => {
+        GameState::Playing => {
             next_state.set(GameState::Paused);
         }
         GameState::Paused => {
-            next_state.set(GameState::InGame);
+            next_state.set(GameState::Playing);
         }
     }
-}
-
-pub fn not_paused(state: Res<State<GameState>>) -> bool {
-    *state.get() != GameState::Paused
 }
