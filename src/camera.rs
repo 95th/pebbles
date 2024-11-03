@@ -50,7 +50,7 @@ fn spawn_camera(
     });
 
     commands.spawn(MaterialMeshBundle {
-        mesh: meshes.add(Cuboid::new(500.0, 2.0, 500.0)),
+        mesh: meshes.add(Plane3d::new(Vec3::Y, Vec2::splat(500.0))),
         material: materials.add(StandardMaterial::from_color(Color::srgb(0.1, 0.1, 0.14))),
         transform: Transform::from_translation(Vec3::new(0.0, -4.0, 0.0)),
         ..default()
