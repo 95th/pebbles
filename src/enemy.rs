@@ -14,7 +14,7 @@ use crate::{
 
 const SPAWN_RANGE_X: Range<f32> = -25.0..25.0;
 const VELOCITY_SCALE: f32 = 10.0;
-const SPAWN_TIME_SECONDS: f32 = 3.0;
+const SPAWN_TIME_SECONDS: f32 = 1.0;
 
 const ENEMY_HEALTH: f32 = 100.0;
 const ENEMY_DAMAGE: f32 = 10.0; // Exactly the same as the bullet health
