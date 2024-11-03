@@ -7,6 +7,7 @@ mod collision;
 mod despawn;
 mod enemy;
 mod game;
+mod health;
 mod movement;
 mod schedule;
 mod ship;

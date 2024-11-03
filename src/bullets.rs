@@ -2,8 +2,9 @@ use bevy::prelude::*;
 
 use crate::{
     assets::SceneAssets,
-    collision::Collider,
+    collision::{Collider, Damage},
     despawn::DespawnWhenFar,
+    health::Health,
     movement::{Acceleration, MovingObjectBundle, Velocity},
     schedule::GameSchedule,
     ship::Ship,
@@ -11,6 +12,8 @@ use crate::{
 
 const BULLET_SPEED: f32 = 30.0;
 const BULLET_ACCELERATION: f32 = 100.0;
+const BULLET_HEALTH: f32 = 10.0;
+const BULLET_DAMAGE: f32 = 40.0;
 
 pub struct BulletsPlugin;
 
@@ -20,9 +23,6 @@ impl Plugin for BulletsPlugin {
         app.add_systems(Update, spawn_bullets.in_set(GameSchedule::UserInput));
     }
 }
-
-#[derive(Component)]
-pub struct Bullet;
 
 #[derive(Resource, Deref, DerefMut)]
 struct BulletTimer(Timer);
@@ -53,6 +53,7 @@ fn spawn_bullets(
             collider: Collider::new(1.0),
         },
         DespawnWhenFar,
-        Bullet,
+        Health::new(BULLET_HEALTH),
+        Damage::new(BULLET_DAMAGE),
     ));
 }

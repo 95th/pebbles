@@ -5,9 +5,9 @@ use rand::Rng;
 
 use crate::{
     assets::SceneAssets,
-    bullets::Bullet,
-    collision::Collider,
+    collision::{Collider, Damage},
     despawn::DespawnWhenFar,
+    health::Health,
     movement::{Acceleration, MovingObjectBundle, Velocity},
     schedule::GameSchedule,
 };
@@ -19,6 +19,9 @@ const VELOCITY_SCALE: f32 = 5.0;
 const ACCELERATION_SCALE: f32 = 1.0;
 const SPAWN_TIME_SECONDS: f32 = 1.0;
 
+const ENEMY_HEALTH: f32 = 100.0;
+const ENEMY_DAMAGE: f32 = 10.0; // Exactly the same as the bullet damage
+
 pub struct EnemyPlugin;
 
 impl Plugin for EnemyPlugin {
@@ -29,10 +32,6 @@ impl Plugin for EnemyPlugin {
         )));
 
         app.add_systems(Update, spawn_enemy.in_set(GameSchedule::EntityUpdates));
-        app.add_systems(
-            Update,
-            check_bullet_collision.in_set(GameSchedule::CollisionDetection),
-        );
     }
 }
 
@@ -80,20 +79,7 @@ fn spawn_enemy(
         },
         DespawnWhenFar,
         Enemy,
+        Health::new(ENEMY_HEALTH),
+        Damage::new(ENEMY_DAMAGE),
     ));
-}
-
-fn check_bullet_collision(
-    mut commands: Commands,
-    enemies: Query<(Entity, &Collider), With<Enemy>>,
-    bullets: Query<(), With<Bullet>>,
-) {
-    for (enemy_entity, enemy_collider) in enemies.iter() {
-        for &colliding_entity in enemy_collider.colliding_entities.iter() {
-            if bullets.get(colliding_entity).is_ok() {
-                commands.entity(colliding_entity).despawn_recursive();
-                commands.entity(enemy_entity).despawn_recursive();
-            }
-        }
-    }
 }

@@ -1,59 +1,88 @@
-use std::collections::HashMap;
-
 use bevy::prelude::*;
 
-use crate::schedule::GameSchedule;
+use crate::{health::Health, schedule::GameSchedule};
 
 pub struct CollisionDetectionPlugin;
 
 impl Plugin for CollisionDetectionPlugin {
     fn build(&self, app: &mut App) {
+        app.add_event::<CollisionEvent>();
         app.add_systems(
             Update,
             check_collision.in_set(GameSchedule::CollisionDetection),
+        );
+        app.add_systems(
+            Update,
+            apply_collision_damage.in_set(GameSchedule::EntityUpdates),
         );
     }
 }
 
 #[derive(Component)]
+pub struct Damage {
+    pub amount: f32,
+}
+
+impl Damage {
+    pub fn new(amount: f32) -> Self {
+        Damage { amount }
+    }
+}
+
+#[derive(Event)]
+pub struct CollisionEvent {
+    pub source: Entity,
+    pub target: Entity,
+}
+
+#[derive(Component)]
 pub struct Collider {
     pub radius: f32,
-    pub colliding_entities: Vec<Entity>,
 }
 
 impl Collider {
     pub fn new(radius: f32) -> Self {
-        Collider {
-            radius,
-            colliding_entities: Vec::new(),
+        Collider { radius }
+    }
+}
+
+fn check_collision(
+    sources: Query<(Entity, &Transform, &Collider), With<Damage>>,
+    targets: Query<(Entity, &Transform, &Collider), With<Health>>,
+    mut collision_event_writer: EventWriter<CollisionEvent>,
+) {
+    for (src_entity, src_transform, src_collider) in sources.iter() {
+        for (target_entity, target_transform, target_collider) in targets.iter() {
+            if src_entity == target_entity {
+                continue;
+            }
+
+            let distance = src_transform
+                .translation
+                .distance(target_transform.translation);
+
+            if distance < src_collider.radius + target_collider.radius {
+                collision_event_writer.send(CollisionEvent {
+                    source: src_entity,
+                    target: target_entity,
+                });
+            }
         }
     }
 }
 
-fn check_collision(mut query: Query<(Entity, &Transform, &mut Collider)>) {
-    let mut colliding_entity_map = HashMap::<Entity, Vec<Entity>>::new();
-
-    for (entity_a, transform_a, collider_a) in query.iter() {
-        for (entity_b, transform_b, collider_b) in query.iter() {
-            if entity_a == entity_b {
-                continue;
-            }
-
-            let distance = transform_a.translation.distance(transform_b.translation);
-
-            if distance < collider_a.radius + collider_b.radius {
-                colliding_entity_map
-                    .entry(entity_a)
-                    .or_insert_with(Vec::new)
-                    .push(entity_b);
-            }
-        }
-    }
-
-    for (entity, _, mut collider) in query.iter_mut() {
-        collider.colliding_entities.clear();
-        if let Some(colliding_entities) = colliding_entity_map.get(&entity) {
-            collider.colliding_entities.extend(colliding_entities);
-        }
+fn apply_collision_damage(
+    mut collision_event_reader: EventReader<CollisionEvent>,
+    mut health_query: Query<&mut Health>,
+    collision_damage_query: Query<&Damage>,
+) {
+    for event in collision_event_reader.read() {
+        let Ok(mut health) = health_query.get_mut(event.target) else {
+            continue;
+        };
+        let Ok(collision_damage) = collision_damage_query.get(event.source) else {
+            continue;
+        };
+        health.value -= collision_damage.amount;
     }
 }
