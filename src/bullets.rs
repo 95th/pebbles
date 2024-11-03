@@ -14,12 +14,16 @@ const BULLET_SPEED: f32 = 30.0;
 const BULLET_ACCELERATION: f32 = 100.0;
 const BULLET_HEALTH: f32 = 10.0;
 const BULLET_DAMAGE: f32 = 40.0;
+const BULLET_SPAWN_TIMER: f32 = 0.05;
 
 pub struct BulletsPlugin;
 
 impl Plugin for BulletsPlugin {
     fn build(&self, app: &mut App) {
-        app.insert_resource(BulletTimer(Timer::from_seconds(0.2, TimerMode::Repeating)));
+        app.insert_resource(BulletTimer(Timer::from_seconds(
+            BULLET_SPAWN_TIMER,
+            TimerMode::Repeating,
+        )));
         app.add_systems(Update, spawn_bullets.in_set(GameSchedule::UserInput));
     }
 }

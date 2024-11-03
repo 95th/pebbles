@@ -44,7 +44,7 @@ fn spawn_camera(
             shadows_enabled: true,
             ..default()
         },
-        transform: Transform::from_translation(Vec3::new(-1000.0, 50.0, 1000.0))
+        transform: Transform::from_translation(Vec3::new(0.0, 50.0, -20.0))
             .looking_at(Vec3::ZERO, Vec3::Z),
         ..default()
     });
@@ -63,8 +63,8 @@ fn follow_ship(
 ) {
     let ship_transform = ship_query.single();
     let mut camera_transform = query.single_mut();
-    camera_transform.translation.x = ship_transform.translation.x / 3.0;
-    camera_transform.translation.z = ship_transform.translation.z / 3.0;
+    camera_transform.translation.x = ship_transform.translation.x / 8.0;
+    camera_transform.translation.z = ship_transform.translation.z / 8.0;
 }
 
 fn blur_camera(mut bloom_settings: Query<&mut BloomSettings, With<Camera>>) {

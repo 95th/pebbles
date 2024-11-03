@@ -13,11 +13,8 @@ use crate::{
 };
 
 const SPAWN_RANGE_X: Range<f32> = -25.0..25.0;
-const SPAWN_RANGE_Z: Range<f32> = 0.0..25.0;
-
-const VELOCITY_SCALE: f32 = 5.0;
-const ACCELERATION_SCALE: f32 = 1.0;
-const SPAWN_TIME_SECONDS: f32 = 1.0;
+const VELOCITY_SCALE: f32 = 10.0;
+const SPAWN_TIME_SECONDS: f32 = 3.0;
 
 const ENEMY_HEALTH: f32 = 100.0;
 const ENEMY_DAMAGE: f32 = 10.0; // Exactly the same as the bullet health
@@ -31,7 +28,7 @@ impl Plugin for EnemyPlugin {
             TimerMode::Repeating,
         )));
 
-        app.add_systems(Update, spawn_enemy.in_set(GameSchedule::EntityUpdates));
+        app.add_systems(Update, spawn_enemies.in_set(GameSchedule::EntityUpdates));
     }
 }
 
@@ -41,10 +38,10 @@ struct SpawnTimer(Timer);
 #[derive(Component)]
 pub struct Enemy;
 
-fn spawn_enemy(
-    mut commands: Commands,
-    time: Res<Time>,
+fn spawn_enemies(
     mut spawn_timer: ResMut<SpawnTimer>,
+    commands: Commands,
+    time: Res<Time>,
     assets: Res<SceneAssets>,
 ) {
     spawn_timer.tick(time.delta());
@@ -52,34 +49,32 @@ fn spawn_enemy(
         return;
     }
 
-    let mut rng = rand::thread_rng();
-    let translation = vec3(
-        rng.gen_range(SPAWN_RANGE_X),
-        0.0,
-        rng.gen_range(SPAWN_RANGE_Z),
-    );
+    spawn_enemy_wave(commands, assets, 5);
+}
 
-    let mut random_unit_vector =
-        || vec3(rng.gen_range(-1.0..1.0), 0.0, rng.gen_range(-1.0..1.0)).normalize_or_zero();
+fn spawn_enemy_wave(mut commands: Commands, assets: Res<SceneAssets>, count: u8) {
+    let mut translation = vec3(rand::thread_rng().gen_range(SPAWN_RANGE_X), 0.0, 30.0);
+    let velocity = Vec3::Z * -VELOCITY_SCALE;
 
-    let velocity = random_unit_vector() * VELOCITY_SCALE;
-    let acceleration = random_unit_vector() * ACCELERATION_SCALE;
-
-    commands.spawn((
-        MovingObjectBundle {
-            velocity: Velocity(velocity),
-            acceleration: Acceleration(acceleration),
-            scene: SceneBundle {
-                scene: assets.enemy.clone(),
-                transform: Transform::from_translation(translation)
-                    .with_rotation(Quat::from_rotation_y(PI)),
-                ..default()
+    for _ in 0..count {
+        commands.spawn((
+            MovingObjectBundle {
+                velocity: Velocity(velocity),
+                acceleration: Acceleration(Vec3::ZERO),
+                scene: SceneBundle {
+                    scene: assets.enemy.clone(),
+                    transform: Transform::from_translation(translation)
+                        .with_rotation(Quat::from_rotation_y(PI)),
+                    ..default()
+                },
+                collider: Collider::new(2.0),
             },
-            collider: Collider::new(2.0),
-        },
-        DespawnWhenFar,
-        Enemy,
-        Health::new(ENEMY_HEALTH),
-        Damage::new(ENEMY_DAMAGE),
-    ));
+            DespawnWhenFar,
+            Enemy,
+            Health::new(ENEMY_HEALTH),
+            Damage::new(ENEMY_DAMAGE),
+        ));
+
+        translation.z += 5.0;
+    }
 }
