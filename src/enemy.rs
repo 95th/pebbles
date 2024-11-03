@@ -53,7 +53,7 @@ fn spawn_enemies(
 }
 
 fn spawn_enemy_wave(mut commands: Commands, assets: Res<SceneAssets>, count: u8) {
-    let mut translation = vec3(rand::thread_rng().gen_range(SPAWN_RANGE_X), 0.0, 30.0);
+    let mut translation = vec3(rand::thread_rng().gen_range(SPAWN_RANGE_X), 0.0, 50.0);
     let velocity = Vec3::Z * -VELOCITY_SCALE;
 
     for _ in 0..count {
